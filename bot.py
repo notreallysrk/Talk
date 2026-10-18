@@ -9,7 +9,7 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Gemini AI (Ultra Fast Flash Model)
+# Gemini AI Setup (Ultra Fast Flash Model)
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash') 
 
@@ -20,10 +20,20 @@ bot_username = bot_info.username
 
 def get_gemini_reply(user_text):
     try:
-        response = model.generate_content(user_text)
+        # Safety filters ko off kar rahe hain taaki API faltu mein block na kare
+        safety_settings = [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+        ]
+        
+        response = model.generate_content(user_text, safety_settings=safety_settings)
         return response.text
+
     except Exception as e:
-        return "Maaf karna, main thoda busy hoon. Ek second baad try karein! 😅"
+        # Ab error aayega toh seedha chat mein dikhega!
+        return f"System Error: {e}"
 
 # ✨ Start Command with Colored Emojis Buttons
 @bot.message_handler(commands=['start', 'help'])
@@ -38,7 +48,7 @@ def send_welcome(message):
     )
     
     markup = InlineKeyboardMarkup()
-    # Yahan apne asli links daalna mat bhoolna
+    # Yahan apne asli links daal dijiyega baad mein
     support_url = "https://t.me/ApnaSupportUsername"
     update_url = "https://t.me/ApnaUpdateChannel"
     
@@ -76,5 +86,5 @@ def handle_group_message(message):
             reply = get_gemini_reply(clean_text)
             bot.reply_to(message, reply)
 
-print(f"🚀 Bot @{bot_username} Superfast mode mein start ho gaya hai!")
+print(f"🚀 Bot @{bot_username} Debug mode ke sath start ho gaya hai!")
 bot.infinity_polling(timeout=10, long_polling_timeout=5)
