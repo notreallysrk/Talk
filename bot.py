@@ -12,9 +12,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # Gemini AI Setup
 genai.configure(api_key=GEMINI_API_KEY)
 
-# 🛑 YAHAN FIX KIYA HAI: 'gemini-1.5-flash-latest' kar diya gaya hai taaki 404 error na aaye.
-# Agar by chance ye bhi error de, toh iski jagah 'gemini-pro' likh dijiyega.
-model = genai.GenerativeModel('gemini-1.5-flash-latest') 
+# 🛑 FINAL FIX: Model ko 'gemini-pro' kar diya hai jo hamesha chalega!
+model = genai.GenerativeModel('gemini-pro') 
 
 # Bot Setup (Multi-threading on for fast processing)
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN, threaded=True, num_threads=20)
@@ -89,5 +88,5 @@ def handle_group_message(message):
             reply = get_gemini_reply(clean_text)
             bot.reply_to(message, reply)
 
-print(f"🚀 Bot @{bot_username} Error-Free mode ke sath start ho gaya hai!")
+print(f"🚀 Bot @{bot_username} Gemini-Pro ke sath start ho gaya hai!")
 bot.infinity_polling(timeout=10, long_polling_timeout=5)
